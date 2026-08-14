@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1022110943350",
+    "project_id": "oil-radar",
+    "storage_bucket": "oil-radar.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022110943350:android:48f96eb23708effaecf757",
+        "android_client_info": {
+          "package_name": "com.oilradar.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1022110943350-c9d7i7aegovi7qkomqofisj15rouu7a4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oilradar.android",
+            "certificate_hash": "b9982d2c68ae5d0e9fbf049b3d5c0592bf99e5b6"
+          }
+        },
+        {
+          "client_id": "1022110943350-u5fp04sb69d4bg9ndaofsh2pc44hq6ie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8_rRrbVj8DZPoZIWHGaovLyKZ-05Gr7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1022110943350-u5fp04sb69d4bg9ndaofsh2pc44hq6ie.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1022110943350-nh25ctulj8e913ufs1shkbmt3ki2nafm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.oilradar.ios"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
