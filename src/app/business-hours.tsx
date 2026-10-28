@@ -1,0 +1,21 @@
+import { useCallback, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
+import { mobileApi } from "@/services/mobile-api";
+const rose = "#a72e68", ink = "#24151d", muted = "#7b6c74";
+const days = [{ dayOfWeek: "MONDAY", label: "Segunda-feira" }, { dayOfWeek: "TUESDAY", label: "Terça-feira" }, { dayOfWeek: "WEDNESDAY", label: "Quarta-feira" }, { dayOfWeek: "THURSDAY", label: "Quinta-feira" }, { dayOfWeek: "FRIDAY", label: "Sexta-feira" }, { dayOfWeek: "SATURDAY", label: "Sábado" }, { dayOfWeek: "SUNDAY", label: "Domingo" }];
+type Schedule = { dayOfWeek: string; openTime: string; closeTime: string; closed: boolean };
+const defaults = days.map((x) => ({ dayOfWeek: x.dayOfWeek, openTime: "08:00", closeTime: "18:00", closed: x.dayOfWeek === "SUNDAY" }));
+export default function BusinessHoursScreen() {
+ const router = useRouter(); const [items, setItems] = useState<Schedule[]>(defaults); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false); const [error, setError] = useState("");
+ const load = useCallback(async () => { setLoading(true); try { const data = await mobileApi<{ schedules: Schedule[] }>("/api/mobile/services"); setItems(days.map((d) => data.schedules.find((x) => x.dayOfWeek === d.dayOfWeek) ?? defaults.find((x) => x.dayOfWeek === d.dayOfWeek)!)); } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível carregar."); } finally { setLoading(false); } }, []);
+ useFocusEffect(useCallback(() => { void load(); }, [load]));
+ const update = (i: number, patch: Partial<Schedule>) => setItems((old) => old.map((x, n) => i === n ? { ...x, ...patch } : x));
+ const save = async () => { setSaving(true); setError(""); try { await mobileApi("/api/mobile/schedule", { method: "PATCH", body: JSON.stringify({ schedules: items }) }); router.back(); } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível guardar."); } finally { setSaving(false); } };
+ if (loading) return <View style={s.center}><ActivityIndicator color={rose} /></View>;
+ return <ScrollView contentInsetAdjustmentBehavior="automatic" style={s.screen} contentContainerStyle={s.page}><Pressable onPress={() => router.back()}><Text style={s.link}>‹ Meu negócio</Text></Pressable><Text style={s.title}>Horários</Text><Text style={s.muted}>Defina quando o estabelecimento aceita reservas.</Text>
+  {items.map((x, i) => <View key={x.dayOfWeek} style={s.card}><View style={s.row}><Text style={s.bold}>{days[i].label}</Text><Switch value={!x.closed} onValueChange={(open) => update(i, { closed: !open })} trackColor={{ true: rose }} /></View>{!x.closed && <View style={s.row}><TextInput value={x.openTime} onChangeText={(v) => update(i, { openTime: v })} maxLength={5} placeholder="08:00" style={s.input} /><Text style={s.muted}>até</Text><TextInput value={x.closeTime} onChangeText={(v) => update(i, { closeTime: v })} maxLength={5} placeholder="18:00" style={s.input} /></View>}</View>)}
+  {error ? <Text style={s.error}>{error}</Text> : null}<Pressable disabled={saving} onPress={save} style={s.button}><Text style={s.buttonText}>{saving ? "A guardar…" : "Guardar horários"}</Text></Pressable>
+ </ScrollView>;
+}
+const s = StyleSheet.create({ screen: { flex: 1, backgroundColor: "#fbf8f9" }, page: { gap: 12, padding: 20 }, center: { flex: 1, alignItems: "center", justifyContent: "center" }, title: { color: ink, fontSize: 25, fontWeight: "800" }, muted: { color: muted, fontSize: 11 }, card: { gap: 9, padding: 13, backgroundColor: "white", borderWidth: 1, borderColor: "#eee5e9", borderRadius: 15 }, row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }, bold: { color: ink, fontSize: 12, fontWeight: "700" }, input: { flex: 1, minHeight: 40, textAlign: "center", borderWidth: 1, borderColor: "#eee5e9", borderRadius: 10 }, link: { color: rose, fontWeight: "700" }, error: { color: "#a52f43", fontSize: 12 }, button: { minHeight: 45, alignItems: "center", justifyContent: "center", borderRadius: 13, backgroundColor: "#571d3b" }, buttonText: { color: "white", fontWeight: "700" } });
